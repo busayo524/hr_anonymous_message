@@ -11,3 +11,4 @@ venv/
 .env/
 .envrc
 .venv/odoo.conf
+odoo.conf

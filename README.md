@@ -8,12 +8,12 @@ This Odoo module allows employees to send anonymous messages to HR, enabling con
 - HR managers can view, acknowledge, and resolve messages.
 - Automatic email notifications to HR when a message is submitted.
 - HR internal notes for private tracking.
-- Configurable HR email address via **Settings → General Settings → HR Anonymous Messages**.
+- Configurable HR email address via Settings → General Settings → HR Anonymous Messages**.
 - Permissions system: restrict certain fields to HR/Admin users.
 
 ## Installation
 
-1. Clone the repository into your Odoo `addons` directory:
+## 1. Clone the repository into your Odoo `addons` directory:
 
 ```bash
 git clone https://github.com/busayo524/# HR Anonymous Message Module for Odoo 19
@@ -54,7 +54,7 @@ pip --version
 addons_path = C:\Odoo_2\addons,C:\Odoo_2\custom_addons
 db_host = localhost
 db_port = 5432
-db_user = odoo
+db_user = yourusername
 db_password = yourpassword
 logfile = C:\Odoo_2\odoo.log
 
