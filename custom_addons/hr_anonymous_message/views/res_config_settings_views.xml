@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="res_config_settings_view_form_inherit_hr_anonymous" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.hr.anonymous</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app string="HR Anonymous Messages" name="hr_anonymous_message">
+                        <block title="Anonymous Messaging Configuration">
+                            <setting id="hr_anonymous_email_setting">
+                                <label for="hr_anonymous_email" string="HR Email Address"/>
+                                <div class="text-muted">
+                                    Email address where anonymous messages will be sent
+                                </div>
+                                <field name="hr_anonymous_email" placeholder="hr@yourcompany.com"/>
+                            </setting>
+                            <setting id="anonymous_message_auto_send_setting">
+                                <label for="anonymous_message_auto_send" string="Auto-send Messages"/>
+                                <div class="text-muted">
+                                    Automatically send email notifications when messages are created
+                                </div>
+                                <field name="anonymous_message_auto_send"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
