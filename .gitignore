@@ -11,4 +11,9 @@ venv/
 .env/
 .envrc
 .venv/odoo.conf
+
+# IDEs
+.idea/
 odoo.conf
+.vscode/
+*.code-workspace

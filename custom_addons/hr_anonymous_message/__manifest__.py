@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'HR Anonymous Messaging',
-    'version': '1.0.0',
+    'name': 'HR Anonymous Messaging System',
+    'version': '2.0.0',
     'category': 'Human Resources',
-    'summary': 'Allow employees to send anonymous messages to HR',
+    'summary': 'Fully anonymous messaging system with encrypted audit trail',
     'description': """
         HR Anonymous Messaging System
         ==============================
         
         Features:
         ---------
-        * Employees can send anonymous messages to HR
-        * Messages are categorized (complaints, suggestions, harassment, etc.)
-        * Sender identity is logged for audit but not visible to HR
-        * Automatic email notifications to HR
-        * Configurable HR email address
-        * Audit trail for compliance
+        * 100% Anonymous - NO ONE can see sender identity
+        * Encrypted audit trail for legal compliance
+        * Real-time notifications
+        * Status workflow management
+        * Monthly Excel reports
+        * Complete anonymity guaranteed
     """,
     'author': 'Promethean Consulting Limited',
     'website': 'https://prometheanconsult.com/',
     'depends': ['base', 'hr', 'mail'],
     'data': [
-        'security/security.xml',
+        # 'security/security.xml',
         'security/ir.model.access.csv',
         'data/mail_template.xml',
+        'data/ir_cron.xml',
         'views/hr_anonymous_message_views.xml',
         'views/res_config_settings_views.xml',
-        #'views/templates.xml',
     ],
     'installable': True,
     'application': True,

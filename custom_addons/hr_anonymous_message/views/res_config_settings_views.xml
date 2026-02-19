@@ -8,22 +8,49 @@
             <field name="inherit_id" ref="base.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//form" position="inside">
-                    <app string="HR Anonymous Messages" name="hr_anonymous_message">
-                        <block title="Anonymous Messaging Configuration">
-                            <setting id="hr_anonymous_email_setting">
+                    <app string="HR Anonymous Messages" name="hr_anonymous_message" groups="base.group_system">
+                        <block title="Email Configuration">
+                            <setting id="hr_anonymous_email_setting" help="Configure where anonymous messages should be sent">
                                 <label for="hr_anonymous_email" string="HR Email Address"/>
                                 <div class="text-muted">
-                                    Email address where anonymous messages will be sent
+                                    Primary email address to receive anonymous messages
                                 </div>
                                 <field name="hr_anonymous_email" placeholder="hr@yourcompany.com"/>
                             </setting>
-                            <setting id="anonymous_message_auto_send_setting">
-                                <label for="anonymous_message_auto_send" string="Auto-send Messages"/>
+                        </block>
+                        
+                        <block title="Monthly Excel Reports">
+                            <setting id="enable_monthly_report_setting" 
+                                     help="Automatically send Excel reports of all anonymous messages">
+                                <label for="enable_monthly_report" string="Enable Monthly Reports"/>
                                 <div class="text-muted">
-                                    Automatically send email notifications when messages are created
+                                    Send comprehensive Excel report to HR email every month
                                 </div>
-                                <field name="anonymous_message_auto_send"/>
+                                <field name="enable_monthly_report"/>
                             </setting>
+                            
+                            <setting id="monthly_report_day_setting" 
+                                     invisible="not enable_monthly_report">
+                                <label for="monthly_report_day" string="Report Day"/>
+                                <div class="text-muted">
+                                    Day of month to send the report (1-28)
+                                </div>
+                                <field name="monthly_report_day"/>
+                            </setting>
+                        </block>
+                        
+                        <block title="Information">
+                            <div class="alert alert-info" role="alert">
+                                <h5>📊 Monthly Report Contents:</h5>
+                                <ul>
+                                    <li>All messages received in the previous month</li>
+                                    <li>Message categories and priorities</li>
+                                    <li>Status of each message</li>
+                                    <li>Date and time sent</li>
+                                    <li>Resolution details (if applicable)</li>
+                                    <li><strong>Note:</strong> Sender identity is NOT included to maintain anonymity</li>
+                                </ul>
+                            </div>
                         </block>
                     </app>
                 </xpath>

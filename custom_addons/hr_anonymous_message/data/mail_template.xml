@@ -3,86 +3,56 @@
     <data noupdate="1">
 
         <record id="email_template_anonymous_message" model="mail.template">
-            <field name="name">Anonymous Message to HR</field>
+            <field name="name">New Anonymous Message Notification</field>
             <field name="model_id" ref="model_hr_anonymous_message"/>
-            <field name="subject">Anonymous Employee Message: {{ object.name }}</field>
-            <field name="email_from">{{ (object.company_id.email or 'noreply@localhost') }}</field>
-            <field name="email_to">{{ user.company_id.email or 'hr@localhost' }}</field>
-            <field name="body_html" type="html">
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd;">
-    <h2 style="color: #2c3e50;">Anonymous Employee Message</h2>
-    
-    <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
-        <tr>
-            <td style="padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd;">
-                <strong>Category:</strong>
-            </td>
-            <td style="padding: 10px; border: 1px solid #ddd;">
-                {{ dict(object._fields['category'].selection).get(object.category) }}
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd;">
-                <strong>Subject:</strong>
-            </td>
-            <td style="padding: 10px; border: 1px solid #ddd;">
-                {{ object.name }}
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd;">
-                <strong>Date:</strong>
-            </td>
-            <td style="padding: 10px; border: 1px solid #ddd;">
-                {{ format_datetime(object.create_date, dt_format='yyyy-MM-dd HH:mm:ss', tz=user.tz) }}
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd;">
-                <strong>Priority:</strong>
-            </td>
-            <td style="padding: 10px; border: 1px solid #ddd;">
-                % if object.priority == '3':
-                    <span style="color: #e74c3c;">Urgent</span>
-                % elif object.priority == '2':
-                    <span style="color: #f39c12;">High</span>
-                % elif object.priority == '1':
-                    <span style="color: #3498db;">Normal</span>
-                % else:
-                    <span style="color: #95a5a6;">Low</span>
-                % endif
-            </td>
-        </tr>
-    </table>
-    
-    <hr style="border: 1px solid #ddd; margin: 20px 0;"/>
-    
-    <div style="margin: 20px 0;">
-        <strong>Message:</strong>
-        <div style="margin-top: 10px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3498db;">
-            {{ object.description or '' }}
-        </div>
-    </div>
-    
-    <hr style="border: 1px solid #ddd; margin: 20px 0;"/>
-    
-    <p style="color: #7f8c8d; font-size: 12px; font-style: italic;">
-        This message was sent anonymously through the employee portal.<br/>
-        The sender's identity is logged for audit purposes but is not revealed in this communication.<br/>
-        <br/>
-        <strong>Please log in to Odoo to manage this message.</strong>
-    </p>
-    
-    % if object.id:
-    <p style="text-align: center; margin-top: 20px;">
-        <a href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=hr.anonymous.message&amp;view_type=form" 
-           style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            View in Odoo
-        </a>
-    </p>
-    % endif
-</div>
-            </field>
+            <field name="subject">New Anonymous Message: {{object.name}}</field>
+            <field name="email_from">{{user.email or 'noreply@localhost'}}</field>
+            <field name="body_html"><![CDATA[<table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #555555; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: #FFFFFF; color: #555555; border-collapse:separate;">
+<tbody>
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="middle">
+                    <span style="font-size: 10px;">New Anonymous Message</span><br/>
+                    <span style="font-size: 20px; font-weight: bold;"><t t-out="object.name"/></span>
+                </td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td>
+                    <p><strong>Category:</strong> <t t-out="dict(object._fields['category'].selection).get(object.category, object.category)"/></p>
+                    <p><strong>Priority:</strong> <t t-out="dict(object._fields['priority'].selection).get(object.priority, 'Normal')"/></p>
+                    <br/>
+                    <p><strong>Message:</strong></p>
+                    <p><t t-out="object.description or 'No content'"/></p>
+                    <br/>
+                    <t t-if="object.id">
+                    <p style="text-align: center; margin: 16px 0px 16px 0px;">
+                        <a t-attf-href="{{object.get_base_url()}}/web#id={{object.id}}&amp;model=hr.anonymous.message&amp;view_type=form" 
+                           style="padding: 5px 10px; font-size: 12px; line-height: 18px; color: #FFFFFF; border-color:#875A7B; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius:3px">
+                            View in Odoo
+                        </a>
+                    </p>
+                    </t>
+                    <br/>
+                    <p style="color: #888; font-size: 11px; text-align: center;">
+                        This message was sent anonymously. Sender identity is protected.
+                    </p>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+</table>]]></field>
             <field name="auto_delete" eval="False"/>
         </record>
 
