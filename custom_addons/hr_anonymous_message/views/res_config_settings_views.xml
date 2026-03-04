@@ -8,37 +8,69 @@
             <field name="inherit_id" ref="base.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//form" position="inside">
-                    <app string="HR Anonymous Messages" name="hr_anonymous_message" groups="base.group_system">
+                    <app string="HR Anonymous Messages" name="hr_anonymous_message"
+                         groups="base.group_system">
+
+                        <!-- Email Configuration -->
                         <block title="Email Configuration">
-                            <setting id="hr_anonymous_email_setting" help="Configure where anonymous messages should be sent">
+                            <setting id="hr_anonymous_email_setting"
+                                     help="Configure where anonymous messages should be sent">
                                 <label for="hr_anonymous_email" string="HR Email Address"/>
                                 <div class="text-muted">
-                                    Primary email address to receive anonymous messages
+                                    Primary email address to receive the monthly anonymous messages report
                                 </div>
                                 <field name="hr_anonymous_email" placeholder="hr@yourcompany.com"/>
                             </setting>
                         </block>
-                        
+
+                        <!-- Monthly Excel Reports -->
                         <block title="Monthly Excel Reports">
-                            <setting id="enable_monthly_report_setting" 
+                            <setting id="enable_monthly_report_setting"
                                      help="Automatically send Excel reports of all anonymous messages">
                                 <label for="enable_monthly_report" string="Enable Monthly Reports"/>
                                 <div class="text-muted">
-                                    Send comprehensive Excel report to HR email every month
+                                    Automatically send a comprehensive Excel report to the HR
+                                    email on the configured day each month.
+                                    The report covers all messages from the <strong>previous month</strong>.
                                 </div>
                                 <field name="enable_monthly_report"/>
                             </setting>
-                            
-                            <setting id="monthly_report_day_setting" 
+
+                            <setting id="monthly_report_day_setting"
                                      invisible="not enable_monthly_report">
                                 <label for="monthly_report_day" string="Report Day"/>
                                 <div class="text-muted">
-                                    Day of month to send the report (1-28)
+                                    Day of the month to send the report (1–28).
+                                    e.g. setting <strong>19</strong> means the report
+                                    sends on the 19th of every month.
                                 </div>
                                 <field name="monthly_report_day"/>
                             </setting>
                         </block>
-                        
+
+                        <!-- Manual Test -->
+                        <block title="Test Report">
+                            <setting id="send_test_report_setting"
+                                     help="Send a test report right now using current month data">
+                                <label for="action_send_test_report"
+                                       class="o_form_label"
+                                       string="Send Test Report Now"/>
+                                <div class="text-muted">
+                                    Manually send a report for the <strong>current month</strong>
+                                    to the HR email address right now.
+                                    This does <strong>not</strong> affect the scheduled monthly
+                                    cron — that will continue running normally and sending
+                                    the <strong>previous month's</strong> data on the configured day.
+                                </div>
+                                <button name="action_send_test_report"
+                                        string="📧 Send Test Report"
+                                        type="object"
+                                        class="btn-primary"
+                                        confirm="This will send a test report email with current month messages to the HR email address. Continue?"/>
+                            </setting>
+                        </block>
+
+                        <!-- Information -->
                         <block title="Information">
                             <div class="alert alert-info" role="alert">
                                 <h5>📊 Monthly Report Contents:</h5>
@@ -48,10 +80,35 @@
                                     <li>Status of each message</li>
                                     <li>Date and time sent</li>
                                     <li>Resolution details (if applicable)</li>
-                                    <li><strong>Note:</strong> Sender identity is NOT included to maintain anonymity</li>
+                                    <li>
+                                        <strong>Note:</strong> Sender identity is NOT
+                                        included to maintain anonymity
+                                    </li>
+                                </ul>
+                                <hr/>
+                                <h5>📅 How the schedule works:</h5>
+                                <ul>
+                                    <li>
+                                        The cron runs <strong>daily</strong> and checks
+                                        if today matches the Report Day
+                                    </li>
+                                    <li>
+                                        On the matching day, it sends all messages
+                                        from the <strong>previous calendar month</strong>
+                                    </li>
+                                    <li>
+                                        Example: Report Day = 19 means the report sends on
+                                        19th March covering all of February,
+                                        19th April covering all of March, and so on
+                                    </li>
+                                    <li>
+                                        Use <strong>Send Test Report</strong> above to
+                                        immediately test with current month data
+                                    </li>
                                 </ul>
                             </div>
                         </block>
+
                     </app>
                 </xpath>
             </field>

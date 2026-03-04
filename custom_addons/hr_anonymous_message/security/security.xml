@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        
-        <!-- Record Rules -->
-        
-        <!-- Employees can only see their own messages (using hash  - using inbuilt create_uid) -->
+
+        <record id="group_hr_anonymous_staff" model="res.groups">
+            <field name="name">HR Anonymous Staff</field>
+            <field name="comment">This group is for HR staff can view and manage all anonymous HR messages. Not inherited by system admins.</field>
+        </record>
+
+         <!-- Record Rules -->
+
         <record id="hr_anonymous_message_rule_employee" model="ir.rule">
             <field name="name">Employee: Own Messages Only</field>
             <field name="model_id" ref="model_hr_anonymous_message"/>
@@ -16,9 +20,8 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- HR Users can see all messages but NO sender info -->
         <record id="hr_anonymous_message_rule_hr_user" model="ir.rule">
-            <field name="name">HR User: All Messages (Anonymous)</field>
+            <field name="name">HR Anonymous Staff: All Messages</field>
             <field name="model_id" ref="model_hr_anonymous_message"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
@@ -28,7 +31,17 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- System Admin can see all messages but STILL NO sender info -->
+        <record id="hr_anonymous_message_rule_hr_staff" model="ir.rule">
+            <field name="name">HR Anonymous Staff: All Messages</field>
+            <field name="model_id" ref="model_hr_anonymous_message"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('hr_anonymous_message.group_hr_anonymous_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
         <record id="hr_anonymous_message_rule_admin" model="ir.rule">
             <field name="name">Admin: All Messages (Still Anonymous)</field>
             <field name="model_id" ref="model_hr_anonymous_message"/>
@@ -40,7 +53,6 @@
             <field name="perm_unlink" eval="True"/>
         </record>
 
-        <!-- Audit Log - Read-only for System Admin (emergency/legal access only) -->
         <record id="hr_anonymous_message_audit_rule_admin" model="ir.rule">
             <field name="name">Admin: Audit Logs (Read Only)</field>
             <field name="model_id" ref="model_hr_anonymous_message_audit"/>
@@ -52,5 +64,49 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
+        <record id="hr_anonymous_message_category_rule_employee" model="ir.rule">
+                    <field name="name">Employee: Read Categories Only</field>
+                    <field name="model_id" ref="model_hr_anonymous_message_category"/>
+                    <field name="domain_force">[(1, '=', 1)]</field>
+                    <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+                    <field name="perm_read" eval="True"/>
+                    <field name="perm_write" eval="False"/>
+                    <field name="perm_create" eval="False"/>
+                    <field name="perm_unlink" eval="False"/>
+                </record>
+
+        <record id="hr_anonymous_message_category_rule_hr" model="ir.rule">
+            <field name="name">HR User: Manage Categories</field>
+            <field name="model_id" ref="model_hr_anonymous_message_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="hr_anonymous_message_category_rule_hr_staff" model="ir.rule">
+            <field name="name">HR Anonymous Staff: Manage Categories</field>
+            <field name="model_id" ref="model_hr_anonymous_message_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('hr_anonymous_message.group_hr_anonymous_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="hr_anonymous_message_category_rule_admin" model="ir.rule">
+            <field name="name">Admin: Manage Categories</field>
+            <field name="model_id" ref="model_hr_anonymous_message_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        
     </data>
 </odoo>

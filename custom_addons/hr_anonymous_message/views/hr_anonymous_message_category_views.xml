@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+        <record id="view_hr_anonymous_message_category_list" model="ir.ui.view">
+            <field name="name">hr.anonymous.message.category.list</field>
+            <field name="model">hr.anonymous.message.category</field>
+            <field name="arch" type="xml">
+                <list string="Message Categories" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="message_count" string="Messages" readonly="1"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hr_anonymous_message_category_form" model="ir.ui.view">
+            <field name="name">hr.anonymous.message.category.form</field>
+            <field name="model">hr.anonymous.message.category</field>
+            <field name="arch" type="xml">
+                <form string="Message Category">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="sequence"/>
+                                <field name="active"/>
+                            </group>
+                            <group>
+                                <field name="message_count" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="description" placeholder="Brief description of this category..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hr_anonymous_message_category" model="ir.actions.act_window">
+            <field name="name">Message Categories</field>
+            <field name="res_model">hr.anonymous.message.category</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first category
+                </p>
+                <p>
+                    Categories help HR organise anonymous messages.<br/>
+                    Employees select a category when submitting — no identity is stored.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_anonymous_message_categories"
+                  name="Categories"
+                  parent="menu_anonymous_message_root"
+                  action="action_hr_anonymous_message_category"
+                  groups="hr_anonymous_message.group_hr_anonymous_staff"
+                  sequence="25"/>
+
+    </data>
+</odoo>

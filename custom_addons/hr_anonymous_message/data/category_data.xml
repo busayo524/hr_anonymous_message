@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <data>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             DEFAULT CATEGORIES
+             noupdate="1" means these are only created on first install.
+             HR/Admin can add, edit, or deactivate categories freely
+             after installation without them being reset on upgrade.
+        ════════════════════════════════════════════════════════════════ -->
+
+        <record id="category_complaint" model="hr.anonymous.message.category">
+            <field name="name">Complaint</field>
+            <field name="sequence">10</field>
+            <field name="description">General workplace complaints</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="category_suggestion" model="hr.anonymous.message.category">
+            <field name="name">Suggestion</field>
+            <field name="sequence">20</field>
+            <field name="description">Ideas and improvement suggestions</field>
+            <field name="color">10</field>
+        </record>
+
+        <record id="category_concern" model="hr.anonymous.message.category">
+            <field name="name">Concern</field>
+            <field name="sequence">30</field>
+            <field name="description">General workplace concerns</field>
+            <field name="color">3</field>
+        </record>
+
+        <record id="category_harassment" model="hr.anonymous.message.category">
+            <field name="name">Harassment Report</field>
+            <field name="sequence">40</field>
+            <field name="description">Reports of harassment in the workplace</field>
+            <field name="color">9</field>
+        </record>
+
+        <record id="category_discrimination" model="hr.anonymous.message.category">
+            <field name="name">Discrimination Report</field>
+            <field name="sequence">50</field>
+            <field name="description">Reports of discrimination</field>
+            <field name="color">9</field>
+        </record>
+
+        <record id="category_safety" model="hr.anonymous.message.category">
+            <field name="name">Safety Issue</field>
+            <field name="sequence">60</field>
+            <field name="description">Workplace safety concerns</field>
+            <field name="color">2</field>
+        </record>
+
+        <record id="category_ethics" model="hr.anonymous.message.category">
+            <field name="name">Ethics Violation</field>
+            <field name="sequence">70</field>
+            <field name="description">Reports of ethical violations</field>
+            <field name="color">9</field>
+        </record>
+
+        <record id="category_general" model="hr.anonymous.message.category">
+            <field name="name">General Message</field>
+            <field name="sequence">80</field>
+            <field name="description">Any other anonymous message</field>
+            <field name="color">0</field>
+        </record>
+
+    </data>
+</odoo>

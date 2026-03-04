@@ -14,6 +14,7 @@
         * Encrypted audit trail for legal compliance
         * Real-time notifications
         * Status workflow management
+        * Sidebar search panel with live message counts
         * Monthly Excel reports
         * Complete anonymity guaranteed
     """,
@@ -21,11 +22,15 @@
     'website': 'https://prometheanconsult.com/',
     'depends': ['base', 'hr', 'mail'],
     'data': [
-        # 'security/security.xml',
+        'security/security.xml',
         'security/ir.model.access.csv',
+        'data/category_data.xml',
         'data/mail_template.xml',
         'data/ir_cron.xml',
-        'views/hr_anonymous_message_views.xml',
+        'views/hr_anonymous_message_category_views.xml',
+        'views/hr_anonymous_message_views_employee.xml',
+        'views/hr_anonymous_message_views_hr.xml',
+        'views/hr_anonymous_message_views_admin.xml',
         'views/res_config_settings_views.xml',
     ],
     'installable': True,

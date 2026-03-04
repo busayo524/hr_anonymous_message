@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hr_anonymous_message_search_hr" model="ir.ui.view">
+            <field name="name">hr.anonymous.message.search.hr</field>
+            <field name="model">hr.anonymous.message</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <search string="Search Anonymous Messages">
+
+                    <field name="name" string="Subject"
+                           filter_domain="[('name', 'ilike', self)]"/>
+                    <field name="category_id" string="Category"/>
+
+                    <!-- Priority filters -->
+                    <filter string="Urgent" name="filter_urgent"
+                            domain="[('priority', '=', '3')]"/>
+                    <filter string="High Priority" name="filter_high"
+                            domain="[('priority', '=', '2')]"/>
+                    <filter string="Normal" name="filter_normal"
+                            domain="[('priority', '=', '1')]"/>
+                    <filter string="Low" name="filter_low"
+                            domain="[('priority', '=', '0')]"/>
+
+                    <separator/>
+
+                    <!-- Status filters -->
+                    <filter string="New / Sent" name="filter_sent"
+                            domain="[('state', '=', 'sent')]"/>
+                    <filter string="Acknowledged" name="filter_acknowledged"
+                            domain="[('state', '=', 'acknowledged')]"/>
+                    <filter string="In Progress" name="filter_in_progress"
+                            domain="[('state', '=', 'in_progress')]"/>
+                    <filter string="Resolved" name="filter_resolved"
+                            domain="[('state', '=', 'resolved')]"/>
+                    <filter string="Declined" name="filter_declined"
+                            domain="[('state', '=', 'declined')]"/>
+                    <filter string="Closed by Employee" name="filter_closed"
+                            domain="[('state', '=', 'closed')]"/>
+
+                    <separator/>
+
+                    <!-- Open / Pending action -->
+                    <filter string="Needs Attention" name="filter_needs_attention"
+                            domain="[('state', 'in', ['sent', 'acknowledged'])]"/>
+                    <filter string="Active Cases" name="filter_active"
+                            domain="[('state', 'in', ['sent', 'acknowledged', 'in_progress'])]"/>
+                    <filter string="Completed" name="filter_completed"
+                            domain="[('state', 'in', ['resolved', 'declined', 'closed'])]"/>
+
+                    <separator/>
+
+                    <!-- Date filters -->
+                    <filter string="Received Today" name="filter_today"
+                            domain="[('create_date', '&gt;=', (context_today()).strftime('%Y-%m-%d 00:00:00')),
+                                     ('create_date', '&lt;=', (context_today()).strftime('%Y-%m-%d 23:59:59'))]"/>
+                    <filter string="This Week" name="filter_this_week"
+                            domain="[('create_date', '&gt;=',
+                                      (context_today() - relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Month" name="filter_this_month"
+                            domain="[('create_date', '&gt;=',
+                                      context_today().strftime('%Y-%m-01'))]"/>
+                    <filter string="Last Month" name="filter_last_month"
+                            domain="[('create_date', '&gt;=',
+                                      (context_today() - relativedelta(months=1)).strftime('%Y-%m-01')),
+                                     ('create_date', '&lt;',
+                                      context_today().strftime('%Y-%m-01'))]"/>
+                    <filter string="Date Received" name="filter_create_date" date="create_date"/>
+
+                    <!-- GROUP BY -->
+                    <group expand="0" string="Group By">
+                        <filter string="Category"   name="group_category"  context="{'group_by': 'category_id'}"/>
+                        <filter string="Status"     name="group_state"     context="{'group_by': 'state'}"/>
+                        <filter string="Priority"   name="group_priority"  context="{'group_by': 'priority'}"/>
+                        <filter string="Month Received" name="group_month" context="{'group_by': 'create_date:month'}"/>
+                    </group>
+
+                    <searchpanel>
+
+                        <field name="category_id" string="Category" icon="fa-tag"
+                               select="one" enable_counters="1"/>
+
+                    </searchpanel>
+
+                </search>
+            </field>
+        </record>
+
+        <!-- HR LIST VIEW -->
+        <record id="view_hr_anonymous_message_list_hr" model="ir.ui.view">
+            <field name="name">hr.anonymous.message.list.hr</field>
+            <field name="model">hr.anonymous.message</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <list string="All Anonymous Messages" create="0" edit="1" delete="0"
+                      default_order="priority desc, create_date desc">
+                    <field name="create_date" string="Received" optional="show"/>
+                    <field name="category_id" string="Category" optional="show"/>
+                    <field name="name" string="Subject"/>
+                    <field name="priority" widget="priority" optional="show"/>
+                    <field name="state" widget="badge"
+                           decoration-info="state == 'acknowledged'"
+                           decoration-warning="state in ['sent']"
+                           decoration-success="state == 'resolved'"
+                           decoration-danger="state == 'declined'"
+                           decoration-muted="state in ['closed', 'draft']"/>
+                    <field name="is_closed_by_employee" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!--  HR FORM VIEW  -->
+        <record id="view_hr_anonymous_message_form_hr" model="ir.ui.view">
+            <field name="name">hr.anonymous.message.form.hr</field>
+            <field name="model">hr.anonymous.message</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <form string="Anonymous Message Management" create="0" edit="1" delete="0">
+                    <header>
+                        <button name="action_acknowledge" string="Acknowledge" type="object"
+                                class="oe_highlight"
+                                invisible="state != 'sent'"
+                                groups="hr.group_hr_user"/>
+                        <button name="action_in_progress" string="In Progress" type="object"
+                                invisible="state not in ['sent', 'acknowledged']"
+                                groups="hr.group_hr_user"/>
+                        <button name="action_resolve" string="Resolve" type="object"
+                                class="oe_highlight"
+                                invisible="state != 'in_progress'"
+                                groups="hr.group_hr_user"/>
+                        <button name="action_decline" string="Decline" type="object"
+                                confirm="Add resolution notes explaining why."
+                                invisible="state not in ['sent', 'acknowledged', 'in_progress']"
+                                groups="hr.group_hr_user"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="category_id" readonly="1"/>
+                                <field name="priority" widget="priority" readonly="1"/>
+                                <field name="create_date" string="Received On" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="is_closed_by_employee"/>
+                                <field name="mail_sent"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Message">
+                                <field name="description" widget="html" readonly="1"/>
+                            </page>
+                            <page string="HR Notes" groups="hr.group_hr_user">
+                                <field name="hr_notes"
+                                       placeholder="Internal notes for HR team only"/>
+                            </page>
+                            <page string="Resolution" groups="hr.group_hr_user">
+                                <field name="resolution_notes"
+                                       placeholder="Explain the resolution or reason for declining"/>
+                            </page>
+                        </notebook>
+                        <field name="closed_date" invisible="1"/>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- HR ACTION  — wired to the search view -->
+        <record id="action_hr_anonymous_message_hr" model="ir.actions.act_window">
+            <field name="name">Anonymous Messages (HR)</field>
+            <field name="res_model">hr.anonymous.message</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id"
+                   ref="view_hr_anonymous_message_search_hr"/>
+            <field name="context">{
+                'search_default_filter_active': 1
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No anonymous messages yet
+                </p>
+                <p>
+                    Anonymous messages from employees will appear here.<br/>
+                    Sender identity is protected and cannot be revealed.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_hr_anonymous_message_hr_view_list"
+                model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">list</field>
+            <field name="view_id" ref="view_hr_anonymous_message_list_hr"/>
+            <field name="act_window_id" ref="action_hr_anonymous_message_hr"/>
+        </record>
+
+        <record id="action_hr_anonymous_message_hr_view_form"
+                model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_anonymous_message_form_hr"/>
+            <field name="act_window_id" ref="action_hr_anonymous_message_hr"/>
+        </record>
+
+        <menuitem id="menu_anonymous_message_hr"
+                  name="All Messages (HR)"
+                  parent="menu_anonymous_message_root"
+                  action="action_hr_anonymous_message_hr"
+                  groups="hr_anonymous_message.group_hr_anonymous_staff"
+                  sequence="20"/>
+
+    </data>
+</odoo>
