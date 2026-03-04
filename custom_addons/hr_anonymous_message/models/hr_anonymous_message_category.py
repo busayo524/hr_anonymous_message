@@ -3,11 +3,7 @@ from odoo import models, fields, api, _
 
 
 class HrAnonymousMessageCategory(models.Model):
-    """
-    Message categories managed by HR/Admin.
-    Fully anonymous — this model stores ONLY the category label,
-    never any reference to who sent a message.
-    """
+
     _name = 'hr.anonymous.message.category'
     _description = 'Anonymous Message Category'
     _order = 'sequence, name'
@@ -18,14 +14,12 @@ class HrAnonymousMessageCategory(models.Model):
     active = fields.Boolean(string='Active', default=True)
     color = fields.Integer(string='Color Index', default=0)
 
-    # Count field — shows how many messages use this category
-    # (HR/Admin facing only; never exposes sender identity)
     message_count = fields.Integer(
         string='Message Count',
         compute='_compute_message_count',
+        store=False,
     )
 
-    @api.depends('name')
     def _compute_message_count(self):
         counts = self.env['hr.anonymous.message'].sudo().read_group(
             domain=[('category_id', 'in', self.ids)],
@@ -41,11 +35,7 @@ class HrAnonymousMessageCategory(models.Model):
 
 
 class HrAnonymousMessagePriority(models.Model):
-    """
-    Priority levels — kept as a separate model so the searchpanel
-    sidebar can display them with live counts.
-    Fully anonymous — no sender data stored here.
-    """
+    
     _name = 'hr.anonymous.message.priority'
     _description = 'Anonymous Message Priority Level'
     _order = 'sequence'
@@ -64,9 +54,9 @@ class HrAnonymousMessagePriority(models.Model):
     message_count = fields.Integer(
         string='Message Count',
         compute='_compute_message_count',
+        store=False,
     )
 
-    @api.depends('code')
     def _compute_message_count(self):
         counts = self.env['hr.anonymous.message'].sudo().read_group(
             domain=[('priority', 'in', self.mapped('code'))],

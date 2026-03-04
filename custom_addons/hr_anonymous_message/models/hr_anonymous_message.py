@@ -368,7 +368,7 @@ class HrAnonymousMessage(models.Model):
             row_data = [
                 msg.id,
                 msg.name or '',
-                category_labels.get(msg.category, msg.category or ''),
+                msg.category_id.name if msg.category_id else '',
                 priority_labels.get(msg.priority, msg.priority or ''),
                 state_labels.get(msg.state, msg.state or ''),
                 msg.create_date.strftime('%Y-%m-%d %H:%M') if msg.create_date else '',
