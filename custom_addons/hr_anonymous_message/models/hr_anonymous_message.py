@@ -204,9 +204,7 @@ class HrAnonymousMessage(models.Model):
         self.sudo().activity_schedule(
             'mail.mail_activity_data_todo',
             summary=_('New Anonymous Message: %s') % self.name,
-            note=_('Category: %s') % dict(
-                self._fields['category'].selection
-            ).get(self.category),
+            note=_('Category: %s') % (self.category_id.name if self.category_id else ''),
             user_id=hr_users[0].id,
         )
 

@@ -22,27 +22,25 @@
                             domain="[('state', '=', 'resolved')]"/>
                     <filter string="Closed" name="filter_closed"
                             domain="[('state', 'in', ['declined', 'closed'])]"/>
-
                     <separator/>
-
                     <filter string="Still Open" name="filter_open"
                             domain="[('state', 'in', ['sent', 'acknowledged', 'in_progress'])]"/>
                     <filter string="Completed" name="filter_completed"
                             domain="[('state', 'in', ['resolved', 'declined', 'closed'])]"/>
-
                     <separator/>
-
                     <filter string="This Month" name="filter_this_month"
                             domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
                     <filter string="Date Sent" name="filter_create_date"
                             date="create_date"/>
-
-                    <group expand="0" string="Group By">
-                        <filter string="Category"   name="group_category" context="{'group_by': 'category_id'}"/>
-                        <filter string="Status"     name="group_state"    context="{'group_by': 'state'}"/>
-                        <filter string="Priority"   name="group_priority" context="{'group_by': 'priority'}"/>
-                        <filter string="Month Sent" name="group_month"    context="{'group_by': 'create_date:month'}"/>
-                    </group>
+                    <separator/>
+                    <filter string="Group by Category" name="group_category"
+                            context="{'group_by': 'category_id'}"/>
+                    <filter string="Group by Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Group by Priority" name="group_priority"
+                            context="{'group_by': 'priority'}"/>
+                    <filter string="Group by Month" name="group_month"
+                            context="{'group_by': 'create_date:month'}"/>
 
                     <searchpanel>
                         <field name="state"       string="Status"   icon="fa-circle" select="one" enable_counters="1"/>

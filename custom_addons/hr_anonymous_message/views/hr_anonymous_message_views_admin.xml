@@ -11,8 +11,6 @@
 
                     <field name="name" string="Subject"/>
                     <field name="category_id" string="Category"/>
-                    <!-- filter_domain removed: not valid in Odoo 19 RNG.
-                         Audit hash search uses exact-match by default. -->
                     <field name="sender_audit_hash" string="Audit Hash"
                            groups="base.group_system"/>
 
@@ -20,9 +18,7 @@
                     <filter string="High Priority"  name="filter_high"   domain="[('priority', '=', '2')]"/>
                     <filter string="Normal"         name="filter_normal" domain="[('priority', '=', '1')]"/>
                     <filter string="Low"            name="filter_low"    domain="[('priority', '=', '0')]"/>
-
                     <separator/>
-
                     <filter string="New / Sent"         name="filter_sent"         domain="[('state', '=', 'sent')]"/>
                     <filter string="Acknowledged"       name="filter_acknowledged" domain="[('state', '=', 'acknowledged')]"/>
                     <filter string="In Progress"        name="filter_in_progress"  domain="[('state', '=', 'in_progress')]"/>
@@ -30,9 +26,7 @@
                     <filter string="Declined"           name="filter_declined"     domain="[('state', '=', 'declined')]"/>
                     <filter string="Closed by Employee" name="filter_closed"       domain="[('state', '=', 'closed')]"/>
                     <filter string="Draft (unsent)"     name="filter_draft"        domain="[('state', '=', 'draft')]"/>
-
                     <separator/>
-
                     <filter string="Needs Attention" name="filter_needs_attention"
                             domain="[('state', 'in', ['sent', 'acknowledged'])]"/>
                     <filter string="Active Cases" name="filter_active"
@@ -41,19 +35,15 @@
                             domain="[('state', 'in', ['resolved', 'declined', 'closed'])]"/>
                     <filter string="Email Sent" name="filter_mail_sent"
                             domain="[('mail_sent', '=', True)]"/>
-
                     <separator/>
-
                     <filter string="This Month" name="filter_this_month"
                             domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
                     <filter string="Date Received" name="filter_create_date" date="create_date"/>
-
-                    <group expand="0" string="Group By">
-                        <filter string="Category"       name="group_category" context="{'group_by': 'category_id'}"/>
-                        <filter string="Status"         name="group_state"    context="{'group_by': 'state'}"/>
-                        <filter string="Priority"       name="group_priority" context="{'group_by': 'priority'}"/>
-                        <filter string="Month Received" name="group_month"    context="{'group_by': 'create_date:month'}"/>
-                    </group>
+                    <separator/>
+                    <filter string="Group by Category"       name="group_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Group by Status"         name="group_state"    context="{'group_by': 'state'}"/>
+                    <filter string="Group by Priority"       name="group_priority" context="{'group_by': 'priority'}"/>
+                    <filter string="Group by Month Received" name="group_month"    context="{'group_by': 'create_date:month'}"/>
 
                     <searchpanel>
                         <field name="state"       string="Status"   icon="fa-circle" select="one" enable_counters="1"/>
@@ -149,9 +139,7 @@
             <field name="view_mode">list,form</field>
             <field name="search_view_id" ref="view_hr_anonymous_message_search_admin"/>
             <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    No anonymous messages
-                </p>
+                <p class="o_view_nocontent_smiling_face">No anonymous messages</p>
                 <p>System administrator view with audit capabilities.</p>
             </field>
         </record>
