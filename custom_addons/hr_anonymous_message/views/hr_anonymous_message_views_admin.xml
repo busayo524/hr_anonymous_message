@@ -48,6 +48,7 @@
                     <searchpanel>
                         <field name="state"       string="Status"   icon="fa-circle" select="one" enable_counters="1"/>
                         <field name="category_id" string="Category" icon="fa-tag"    select="one" enable_counters="1"/>
+                        <field name="date_period" string="Date"     icon="fa-calendar"  select="one" enable_counters="1"/>
                     </searchpanel>
 
                 </search>
@@ -60,7 +61,7 @@
             <field name="priority">5</field>
             <field name="arch" type="xml">
                 <list string="All Messages (Admin)" create="0" edit="1" delete="1"
-                      default_order="priority desc, create_date desc">
+                      default_order="create_date desc">
                     <field name="create_date"           optional="show"/>
                     <field name="category_id"           string="Category" optional="show"/>
                     <field name="name"/>

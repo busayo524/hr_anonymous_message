@@ -13,7 +13,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-# Maps old selection key → the name value in hr.anonymous.message.category
 CATEGORY_MAP = {
     'complaint':      'Complaint',
     'suggestion':     'Suggestion',
@@ -41,7 +40,6 @@ def migrate(cr, version):
 
     _logger.info("=== HR Anonymous Message: migrating category field → category_id ===")
 
-    # ── 1. Check old column exists ─────────────────────────────────────
     cr.execute("""
         SELECT column_name
         FROM information_schema.columns
@@ -52,7 +50,6 @@ def migrate(cr, version):
         _logger.info("Old 'category' column not found — nothing to migrate.")
         return
 
-    # ── 2. Ensure category table exists ───────────────────────────────
     cr.execute("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables
@@ -61,12 +58,10 @@ def migrate(cr, version):
     """)
     if not cr.fetchone()[0]:
         _logger.info("Category table doesn't exist yet — will be created by ORM after migration.")
-        # We'll handle this in post-migrate instead
         return
 
-    # ── 3. For each old key, get or create the category record ─────────
     for old_key, category_name in CATEGORY_MAP.items():
-        # Find existing category record by name
+
         cr.execute("""
             SELECT id FROM hr_anonymous_message_category
             WHERE name = %s
@@ -77,7 +72,7 @@ def migrate(cr, version):
         if row:
             category_id = row[0]
         else:
-            # Create it if it doesn't exist yet
+
             cr.execute("""
                 INSERT INTO hr_anonymous_message_category (name, sequence, active)
                 VALUES (%s, %s, TRUE)
@@ -86,7 +81,6 @@ def migrate(cr, version):
             category_id = cr.fetchone()[0]
             _logger.info(f"Created category: {category_name} (id={category_id})")
 
-        # Update all messages with this old category value
         cr.execute("""
             UPDATE hr_anonymous_message
             SET category_id = %s
@@ -98,8 +92,6 @@ def migrate(cr, version):
         if updated:
             _logger.info(f"  Migrated {updated} messages: '{old_key}' → '{category_name}' (id={category_id})")
 
-    # ── 4. Rename old column to category_legacy ────────────────────────
-    # Only rename if category_legacy doesn't already exist
     cr.execute("""
         SELECT column_name
         FROM information_schema.columns

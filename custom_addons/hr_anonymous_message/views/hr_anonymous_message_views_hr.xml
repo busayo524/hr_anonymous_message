@@ -43,6 +43,7 @@
                     <searchpanel>
                         <field name="state"       string="Status"   icon="fa-circle" select="one" enable_counters="1"/>
                         <field name="category_id" string="Category" icon="fa-tag"    select="one" enable_counters="1"/>
+                        <field name="date_period" string="Date"     icon="fa-calendar"  select="one" enable_counters="1"/>
                     </searchpanel>
 
                 </search>

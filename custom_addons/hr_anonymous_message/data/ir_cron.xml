@@ -10,8 +10,20 @@
             <field name="code">model._cron_send_monthly_report()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
             <field name="active" eval="True"/>
+            <field name="nextcall" eval="(datetime.now() + timedelta(days=1)).replace(hour=6, minute=0, second=0)"/>
+        </record>
+
+
+        <record id="ir_cron_recompute_date_period" model="ir.cron">
+            <field name="name">Recompute Anonymous Message Date Periods</field>
+            <field name="model_id" ref="model_hr_anonymous_message"/>
+            <field name="state">code</field>
+            <field name="code">env['hr.anonymous.message'].search([])._compute_date_period()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+            <field name="nextcall" eval="(datetime.now() + timedelta(days=1)).replace(hour=0, minute=5, second=0)"/>
         </record>
 
     </data>

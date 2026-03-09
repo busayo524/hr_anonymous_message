@@ -2,7 +2,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import hashlib
 import base64
 import io
@@ -35,7 +35,7 @@ class HrAnonymousMessage(models.Model):
         ('safety', 'Safety Issue'),
         ('ethics', 'Ethics Violation'),
         ('general', 'General Message'),
-    ], string='Category (Legacy)', default='general')
+    ], string='Category (Legacy)', default='general', required=True)
     
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -46,7 +46,7 @@ class HrAnonymousMessage(models.Model):
         ('declined', 'Declined'),
         ('closed', 'Closed by Employee'),
     ], string='Status', default='draft', required=True, tracking=True)
-    
+
     sender_audit_hash = fields.Char(
         string='Audit Hash', readonly=True,
         help='Encrypted audit trail - not viewable in UI'
@@ -72,11 +72,84 @@ class HrAnonymousMessage(models.Model):
         string='Closed by Employee', default=False, readonly=True
     )
     closed_date = fields.Datetime(string='Closed Date', readonly=True)
+
+    date_period = fields.Selection([
+        ('today',      'Today'),
+        ('this_week',  'This Week'),
+        ('this_month', 'This Month'),
+        ('last_month', 'Last Month'),
+        ('older',      'Older'),
+    ], string='Date Period', compute='_compute_date_period', search='_search_date_period', store=True)
+
     is_my_message = fields.Boolean(
         string='My Message',
         compute='_compute_is_my_message',
         search='_search_is_my_message'
     )
+
+    @api.depends('create_date')
+    def _compute_date_period(self):
+        today = date.today()
+        # Start of this week (Monday)
+        week_start = today - timedelta(days=today.weekday())
+        # Start of this month
+        month_start = today.replace(day=1)
+        # Start of last month
+        if today.month == 1:
+            last_month_start = date(today.year - 1, 12, 1)
+            last_month_end   = date(today.year, 1, 1)
+        else:
+            last_month_start = date(today.year, today.month - 1, 1)
+            last_month_end   = month_start
+
+        for rec in self:
+            if not rec.create_date:
+                rec.date_period = 'older'
+                continue
+            d = rec.create_date.date()
+            if d == today:
+                rec.date_period = 'today'
+            elif d >= week_start:
+                rec.date_period = 'this_week'
+            elif d >= month_start:
+                rec.date_period = 'this_month'
+            elif d >= last_month_start:
+                rec.date_period = 'last_month'
+            else:
+                rec.date_period = 'older'
+
+    @api.model
+    def _search_date_period(self, operator, value):
+        today = date.today()
+        week_start  = today - timedelta(days=today.weekday())
+        month_start = today.replace(day=1)
+        if today.month == 1:
+            last_month_start = date(today.year - 1, 12, 1)
+            last_month_end   = date(today.year, 1, 1)
+        else:
+            last_month_start = date(today.year, today.month - 1, 1)
+            last_month_end   = month_start
+
+        # Map each period key to a domain
+        domains = {
+            'today':      [('create_date', '>=', fields.Datetime.to_string(datetime.combine(today,            datetime.min.time()))),
+                        ('create_date', '<',  fields.Datetime.to_string(datetime.combine(today + timedelta(days=1), datetime.min.time())))],
+            'this_week':  [('create_date', '>=', fields.Datetime.to_string(datetime.combine(week_start,       datetime.min.time()))),
+                        ('create_date', '<',  fields.Datetime.to_string(datetime.combine(today + timedelta(days=1), datetime.min.time())))],
+            'this_month': [('create_date', '>=', fields.Datetime.to_string(datetime.combine(month_start,      datetime.min.time()))),
+                        ('create_date', '<',  fields.Datetime.to_string(datetime.combine(today + timedelta(days=1), datetime.min.time())))],
+            'last_month': [('create_date', '>=', fields.Datetime.to_string(datetime.combine(last_month_start, datetime.min.time()))),
+                        ('create_date', '<',  fields.Datetime.to_string(datetime.combine(last_month_end,   datetime.min.time())))],
+            'older':      [('create_date', '<',  fields.Datetime.to_string(datetime.combine(last_month_start, datetime.min.time())))],
+        }
+
+        if operator == '=' and value in domains:
+            return domains[value]
+        if operator == 'in':
+            # combine with OR if multiple values selected
+            from odoo.osv import expression
+            return expression.OR([domains[v] for v in value if v in domains])
+        return []
 
     @api.depends('sender_audit_hash')
     def _compute_is_my_message(self):
@@ -137,7 +210,6 @@ class HrAnonymousMessage(models.Model):
         """
         self.ensure_one()
 
-        # Validate HR email is configured (needed for monthly cron later)
         ICP = self.env['ir.config_parameter'].sudo()
         hr_email = ICP.get_param('hr_anonymous_message.hr_email', default='').strip()
         if not hr_email:
@@ -151,13 +223,10 @@ class HrAnonymousMessage(models.Model):
             f"Hash: {self.sender_audit_hash[:8]}... (no email sent, monthly cron will handle)"
         )
 
-        # Audit log
         self._create_audit_log()
 
-        # Update state — NO email sent here
         self.write({'state': 'sent', 'mail_sent': False})
 
-        # Notify HR users inside Odoo only
         self._notify_hr_users()
 
         return {
@@ -218,7 +287,6 @@ class HrAnonymousMessage(models.Model):
                 subtype_xmlid='mail.mt_comment',
             )
 
-    # ── HR workflow actions ───
     def action_acknowledge(self):
         self.ensure_one()
         old_state = self.state
@@ -269,7 +337,6 @@ class HrAnonymousMessage(models.Model):
             }
         }
 
-    # ── ORM overrides ───
     @api.model
     def create(self, vals_list):
         if isinstance(vals_list, dict):
@@ -305,7 +372,6 @@ class HrAnonymousMessage(models.Model):
                 if record.state not in ['draft', 'sent', 'closed']:
                     raise ValidationError(_('Only HR users can change message status.'))
 
-    # ── Excel generation ───
     def _generate_excel_export(self, messages):
         """
         Build a styled two-sheet Excel workbook for the monthly report.
@@ -342,7 +408,6 @@ class HrAnonymousMessage(models.Model):
 
         wb = openpyxl.Workbook()
 
-        # ── Sheet 1: Messages ──────────────────────────────────────────
         ws = wb.active
         ws.title = "Anonymous Messages"
 
@@ -385,7 +450,6 @@ class HrAnonymousMessage(models.Model):
                     c.fill = alt_fill
             ws.row_dimensions[row].height = 20
 
-        # ── Sheet 2: Summary ───────────────────────────────────────────
         ws2 = wb.create_sheet(title="Summary")
         ws2.column_dimensions['A'].width = 25
         ws2.column_dimensions['B'].width = 12
@@ -432,7 +496,6 @@ class HrAnonymousMessage(models.Model):
         ws2.cell(row=total_row, column=2).border = bdr
         ws2.cell(row=total_row, column=3, value='100%').border = bdr
 
-        # Status breakdown
         ss = total_row + 3
         ws2.merge_cells(f'A{ss}:C{ss}')
         ws2.cell(row=ss, column=1,
@@ -461,7 +524,6 @@ class HrAnonymousMessage(models.Model):
         buf.seek(0)
         return buf.getvalue()
 
-    # ── Monthly cron ───────────────────────────────────────────────────
     @api.model
     def _cron_send_monthly_report(self):
         """
@@ -475,7 +537,6 @@ class HrAnonymousMessage(models.Model):
 
         ICP = self.env['ir.config_parameter'].sudo()
 
-        # Check enabled
         enable_report = ICP.get_param(
             'hr_anonymous_message.enable_monthly_report', default='False'
         )
@@ -483,7 +544,6 @@ class HrAnonymousMessage(models.Model):
             _logger.info("Monthly reports disabled in settings. Skipping.")
             return
 
-        # Check day
         report_day = int(ICP.get_param(
             'hr_anonymous_message.monthly_report_day', default='1'
         ))
@@ -494,13 +554,11 @@ class HrAnonymousMessage(models.Model):
             )
             return
 
-        # Check HR email
         hr_email = ICP.get_param('hr_anonymous_message.hr_email', default='').strip()
         if not hr_email:
             _logger.error("Monthly report: HR email not configured. Aborting.")
             return
 
-        # ── Date range: previous calendar month ───────────────────────
         if today.month == 1:
             report_month, report_year = 12, today.year - 1
         else:
@@ -526,7 +584,6 @@ class HrAnonymousMessage(models.Model):
         month_name = month_start.strftime('%B %Y')
         _logger.info(f"Found {len(messages)} messages for {month_name}")
 
-        # ── Generate Excel ─────────────────────────────────────────────
         try:
             excel_bytes = self._generate_excel_export(messages)
         except Exception as e:
@@ -536,7 +593,6 @@ class HrAnonymousMessage(models.Model):
 
         filename = f"Anonymous_Messages_{month_start.strftime('%B_%Y')}.xlsx"
 
-        # ── Stats ──────────────────────────────────────────────────────
         total          = len(messages)
         resolved       = len(messages.filtered(lambda m: m.state == 'resolved'))
         in_progress    = len(messages.filtered(lambda m: m.state == 'in_progress'))
@@ -667,7 +723,6 @@ class HrAnonymousMessage(models.Model):
                 f"{total} messages, attachment: {filename}"
             )
 
-            # Unlink attachment after sending to keep DB clean
             attachment.sudo().unlink()
 
         except Exception as e:

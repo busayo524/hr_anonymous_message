@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'HR Anonymous Messaging System',
-    'version': '2.0.0',
+    'version': '2.1.1',
     'category': 'Human Resources',
     'summary': 'Fully anonymous messaging system with encrypted audit trail',
     'description': """
