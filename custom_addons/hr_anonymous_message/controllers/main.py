@@ -12,14 +12,12 @@ class AnonymousMessageController(http.Controller):
         try:
             data = request.jsonrequest
             
-            # Create the message
             message = request.env['hr.anonymous.message'].create({
                 'name': data.get('subject'),
                 'description': data.get('message'),
                 'category': data.get('category', 'general'),
             })
             
-            # Send to HR
             message.send_to_hr()
             
             return {
