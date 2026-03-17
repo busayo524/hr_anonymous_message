@@ -12,7 +12,7 @@
                     <field name="name" string="Subject"/>
                     <field name="category_id" string="Category"/>
                     <field name="sender_audit_hash" string="Audit Hash"
-                           groups="base.group_system"/>
+                           groups="hr_anonymous_message.group_hr_anonymous_admin"/>
 
                     <filter string="Urgent"        name="filter_urgent" domain="[('priority', '=', '3')]"/>
                     <filter string="High Priority"  name="filter_high"   domain="[('priority', '=', '2')]"/>
@@ -46,9 +46,9 @@
                     <filter string="Group by Month Received" name="group_month"    context="{'group_by': 'create_date:month'}"/>
 
                     <searchpanel>
-                        <field name="state"       string="Status"   icon="fa-circle" select="one" enable_counters="1"/>
-                        <field name="category_id" string="Category" icon="fa-tag"    select="one" enable_counters="1"/>
-                        <field name="date_period" string="Date"     icon="fa-calendar"  select="one" enable_counters="1"/>
+                        <field name="state"       string="Status"   icon="fa-circle"   select="one" enable_counters="1"/>
+                        <field name="category_id" string="Category" icon="fa-tag"      select="one" enable_counters="1"/>
+                        <field name="date_period" string="Date"     icon="fa-calendar" select="one" enable_counters="1"/>
                     </searchpanel>
 
                 </search>
@@ -65,7 +65,7 @@
                     <field name="create_date"           optional="show"/>
                     <field name="category_id"           string="Category" optional="show"/>
                     <field name="name"/>
-                    <field name="priority"              widget="priority"  optional="show"/>
+                    <field name="priority"              widget="priority" optional="show"/>
                     <field name="state"                 widget="badge"
                            decoration-info="state == 'acknowledged'"
                            decoration-warning="state in ['sent']"
@@ -87,16 +87,16 @@
                     <header>
                         <button name="action_acknowledge" string="Acknowledge" type="object"
                                 invisible="state != 'sent'"
-                                groups="base.group_system"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_admin"/>
                         <button name="action_in_progress" string="In Progress" type="object"
                                 invisible="state not in ['sent', 'acknowledged']"
-                                groups="base.group_system"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_admin"/>
                         <button name="action_resolve" string="Resolve" type="object"
                                 invisible="state != 'in_progress'"
-                                groups="base.group_system"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_admin"/>
                         <button name="action_decline" string="Decline" type="object"
                                 invisible="state not in ['sent', 'acknowledged', 'in_progress']"
-                                groups="base.group_system"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_admin"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
@@ -110,7 +110,7 @@
                                 <field name="is_closed_by_employee"/>
                                 <field name="mail_sent"/>
                                 <field name="sender_audit_hash" readonly="1"
-                                       groups="base.group_system"/>
+                                       groups="hr_anonymous_message.group_hr_anonymous_admin"/>
                             </group>
                         </group>
                         <group>
@@ -165,7 +165,7 @@
                   name="System Admin"
                   parent="menu_anonymous_message_root"
                   action="action_hr_anonymous_message_admin"
-                  groups="base.group_system"
+                  groups="hr_anonymous_message.group_hr_anonymous_admin"
                   sequence="30"/>
 
     </data>

@@ -8,10 +8,8 @@
             <field name="priority">10</field>
             <field name="arch" type="xml">
                 <search string="Search Anonymous Messages">
-
                     <field name="name" string="Subject"/>
                     <field name="category_id" string="Category"/>
-
                     <filter string="Urgent"        name="filter_urgent" domain="[('priority', '=', '3')]"/>
                     <filter string="High Priority"  name="filter_high"   domain="[('priority', '=', '2')]"/>
                     <filter string="Normal"         name="filter_normal" domain="[('priority', '=', '1')]"/>
@@ -39,13 +37,11 @@
                     <filter string="Group by Status"         name="group_state"    context="{'group_by': 'state'}"/>
                     <filter string="Group by Priority"       name="group_priority" context="{'group_by': 'priority'}"/>
                     <filter string="Group by Month Received" name="group_month"    context="{'group_by': 'create_date:month'}"/>
-
                     <searchpanel>
-                        <field name="state"       string="Status"   icon="fa-circle" select="one" enable_counters="1"/>
-                        <field name="category_id" string="Category" icon="fa-tag"    select="one" enable_counters="1"/>
-                        <field name="date_period" string="Date"     icon="fa-calendar"  select="one" enable_counters="1"/>
+                        <field name="state"       string="Status"   icon="fa-circle"   select="one" enable_counters="1"/>
+                        <field name="category_id" string="Category" icon="fa-tag"      select="one" enable_counters="1"/>
+                        <field name="date_period" string="Date"     icon="fa-calendar" select="one" enable_counters="1"/>
                     </searchpanel>
-
                 </search>
             </field>
         </record>
@@ -82,18 +78,18 @@
                         <button name="action_acknowledge" string="Acknowledge" type="object"
                                 class="oe_highlight"
                                 invisible="state != 'sent'"
-                                groups="hr.group_hr_user"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_staff"/>
                         <button name="action_in_progress" string="In Progress" type="object"
                                 invisible="state not in ['sent', 'acknowledged']"
-                                groups="hr.group_hr_user"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_staff"/>
                         <button name="action_resolve" string="Resolve" type="object"
                                 class="oe_highlight"
                                 invisible="state != 'in_progress'"
-                                groups="hr.group_hr_user"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_staff"/>
                         <button name="action_decline" string="Decline" type="object"
                                 confirm="Add resolution notes explaining why."
                                 invisible="state not in ['sent', 'acknowledged', 'in_progress']"
-                                groups="hr.group_hr_user"/>
+                                groups="hr_anonymous_message.group_hr_anonymous_staff"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
@@ -115,11 +111,13 @@
                             <page string="Message">
                                 <field name="description" widget="html" readonly="1"/>
                             </page>
-                            <page string="HR Notes" groups="hr.group_hr_user">
+                            <page string="HR Notes"
+                                  groups="hr_anonymous_message.group_hr_anonymous_staff">
                                 <field name="hr_notes"
                                        placeholder="Internal notes for HR team only"/>
                             </page>
-                            <page string="Resolution" groups="hr.group_hr_user">
+                            <page string="Resolution"
+                                  groups="hr_anonymous_message.group_hr_anonymous_staff">
                                 <field name="resolution_notes"
                                        placeholder="Explain the resolution or reason for declining"/>
                             </page>
@@ -139,21 +137,18 @@
             <field name="context">{'search_default_filter_active': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">No anonymous messages yet</p>
-                <p>Anonymous messages from employees will appear here.
-                   Sender identity is protected and cannot be revealed.</p>
+                <p>Anonymous messages from employees will appear here.</p>
             </field>
         </record>
 
-        <record id="action_hr_anonymous_message_hr_view_list"
-                model="ir.actions.act_window.view">
+        <record id="action_hr_anonymous_message_hr_view_list" model="ir.actions.act_window.view">
             <field name="sequence" eval="1"/>
             <field name="view_mode">list</field>
             <field name="view_id" ref="view_hr_anonymous_message_list_hr"/>
             <field name="act_window_id" ref="action_hr_anonymous_message_hr"/>
         </record>
 
-        <record id="action_hr_anonymous_message_hr_view_form"
-                model="ir.actions.act_window.view">
+        <record id="action_hr_anonymous_message_hr_view_form" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_hr_anonymous_message_form_hr"/>

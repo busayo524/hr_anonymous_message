@@ -15,8 +15,8 @@
         * Real-time notifications
         * Status workflow management
         * Sidebar search panel with live message counts
-        * Monthly Excel reports
-        * Complete anonymity guaranteed
+        * Monthly Statistic Email report
+        * Role-based Access control via settings
     """,
     'author': 'Promethean Consulting Limited',
     'website': 'https://prometheanconsult.com/',

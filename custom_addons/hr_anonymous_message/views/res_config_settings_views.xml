@@ -2,117 +2,151 @@
 <odoo>
     <data>
 
+        <!-- ============================================================
+             Inherit the main settings form to add our config fields.
+             We intentionally do NOT use <app> here so that this module
+             does NOT appear as a tile in Odoo's main Settings sidebar.
+             The fields are still reachable via the dedicated action below
+             (which opens the form with module context = hr_anonymous_message).
+             ============================================================ -->
         <record id="res_config_settings_view_form_inherit_hr_anonymous" model="ir.ui.view">
             <field name="name">res.config.settings.view.form.inherit.hr.anonymous</field>
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="base.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//form" position="inside">
-                    <app string="HR Anonymous Messages" name="hr_anonymous_message"
-                         groups="base.group_system">
+                    <!--
+                        Using a plain <div> instead of <app> means Odoo will NOT
+                        register this as a Settings app tile, so it won't appear
+                        in the Settings left sidebar at all.
+                        The `data-key` attribute is still required so that Odoo's
+                        settings form controller can filter/highlight this block
+                        when the window action is opened with
+                        context = {'module': 'hr_anonymous_message'}.
+                    -->
+                    <div class="app_settings_block"
+                         data-key="hr_anonymous_message"
+                         groups="hr_anonymous_message.group_hr_anonymous_admin">
 
-                        <!-- Email Configuration -->
-                        <block title="Email Configuration">
-                            <setting id="hr_anonymous_email_setting"
-                                     help="Configure where anonymous messages should be sent">
-                                <label for="hr_anonymous_email" string="HR Email Address"/>
-                                <div class="text-muted">
-                                    Primary email address to receive the monthly anonymous messages report
+                        <h2>HR Anonymous Messages</h2>
+
+                        <div class="row mt16 o_settings_container">
+
+                            <!-- ── Email Configuration ── -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">HR Email Address</span>
+                                    <div class="text-muted">
+                                        Primary email address to receive the monthly
+                                        anonymous messages report
+                                    </div>
+                                    <div class="content-group mt8">
+                                        <field name="hr_anonymous_email"
+                                               placeholder="hr@yourcompany.com"/>
+                                    </div>
                                 </div>
-                                <field name="hr_anonymous_email" placeholder="hr@yourcompany.com"/>
-                            </setting>
-                        </block>
-
-                        <!-- Monthly Excel Reports -->
-                        <block title="Monthly Excel Reports">
-                            <setting id="enable_monthly_report_setting"
-                                     help="Automatically send Excel reports of all anonymous messages">
-                                <label for="enable_monthly_report" string="Enable Monthly Reports"/>
-                                <div class="text-muted">
-                                    Automatically send a comprehensive Excel report to the HR
-                                    email on the configured day each month.
-                                    The report covers all messages from the <strong>previous month</strong>.
-                                </div>
-                                <field name="enable_monthly_report"/>
-                            </setting>
-
-                            <setting id="monthly_report_day_setting"
-                                     invisible="not enable_monthly_report">
-                                <label for="monthly_report_day" string="Report Day"/>
-                                <div class="text-muted">
-                                    Day of the month to send the report (1–28).
-                                    e.g. setting <strong>19</strong> means the report
-                                    sends on the 19th of every month.
-                                </div>
-                                <field name="monthly_report_day"/>
-                            </setting>
-                        </block>
-
-                        <!-- Manual Test -->
-                        <block title="Test Report">
-                            <setting id="send_test_report_setting"
-                                     help="Send a test report right now using current month data">
-                                <label for="action_send_test_report"
-                                       class="o_form_label"
-                                       string="Send Test Report Now"/>
-                                <div class="text-muted">
-                                    Manually send a report for the <strong>current month</strong>
-                                    to the HR email address right now.
-                                    This does <strong>not</strong> affect the scheduled monthly
-                                    cron — that will continue running normally and sending
-                                    the <strong>previous month's</strong> data on the configured day.
-                                </div>
-                                <button name="action_send_test_report"
-                                        string="📧 Send Test Report"
-                                        type="object"
-                                        class="btn-primary"
-                                        confirm="This will send a test report email with current month messages to the HR email address. Continue?"/>
-                            </setting>
-                        </block>
-
-                        <!-- Information -->
-                        <block title="Information">
-                            <div class="alert alert-info" role="alert">
-                                <h5>📊 Monthly Report Contents:</h5>
-                                <ul>
-                                    <li>All messages received in the previous month</li>
-                                    <li>Message categories and priorities</li>
-                                    <li>Status of each message</li>
-                                    <li>Date and time sent</li>
-                                    <li>Resolution details (if applicable)</li>
-                                    <li>
-                                        <strong>Note:</strong> Sender identity is NOT
-                                        included to maintain anonymity
-                                    </li>
-                                </ul>
-                                <hr/>
-                                <h5>📅 How the schedule works:</h5>
-                                <ul>
-                                    <li>
-                                        The cron runs <strong>daily</strong> and checks
-                                        if today matches the Report Day
-                                    </li>
-                                    <li>
-                                        On the matching day, it sends all messages
-                                        from the <strong>previous calendar month</strong>
-                                    </li>
-                                    <li>
-                                        Example: Report Day = 19 means the report sends on
-                                        19th March covering all of February,
-                                        19th April covering all of March, and so on
-                                    </li>
-                                    <li>
-                                        Use <strong>Send Test Report</strong> above to
-                                        immediately test with current month data
-                                    </li>
-                                </ul>
                             </div>
-                        </block>
 
-                    </app>
+                            <!-- ── Enable Monthly Reports ── -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="enable_monthly_report"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Enable Monthly Reports</span>
+                                    <div class="text-muted">
+                                        Automatically send a statistics report to the HR
+                                        email on the configured day each month covering
+                                        the <strong>previous month</strong>.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ── Report Day (visible only when monthly report enabled) ── -->
+                            <div class="col-12 col-lg-6 o_setting_box"
+                                 invisible="not enable_monthly_report">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Report Day</span>
+                                    <div class="text-muted">
+                                        Day of the month to send the report (1–28).
+                                    </div>
+                                    <div class="content-group mt8">
+                                        <field name="monthly_report_day"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ── Send Test Report ── -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Send Test Report Now</span>
+                                    <div class="text-muted">
+                                        Send the statistics report for the
+                                        <strong>current month</strong> to the HR email now.
+                                    </div>
+                                    <div class="content-group mt8">
+                                        <button name="action_send_test_report"
+                                                string="📧 Send Test Report"
+                                                type="object"
+                                                class="btn btn-primary"
+                                                confirm="Send test report to HR email now?"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /.row -->
+
+                        <!-- ── Information banner ── -->
+                        <div role="status" class="alert alert-info mt16">
+                            <h5>📅 How the monthly report works:</h5>
+                            <ul>
+                                <li>Cron runs <strong>daily</strong> and checks
+                                    if today matches the Report Day</li>
+                                <li>On that day it sends the
+                                    <strong>previous month's</strong> statistics</li>
+                                <li>Use <strong>Send Test Report</strong> to preview
+                                    with current month data</li>
+                                <li>No attachments — full report is in the email body</li>
+                            </ul>
+                            <p style="margin-top:8px;">
+                                To manage user roles, go to
+                                <strong>Settings → Users &amp; Companies → Users</strong>
+                                and set the <strong>Anonymous HR Role</strong> on each user.
+                            </p>
+                        </div>
+
+                    </div><!-- /.app_settings_block -->
                 </xpath>
             </field>
         </record>
+
+        <!-- ============================================================
+             Dedicated action that opens ONLY the Anonymous HR settings
+             block — used by the Report & Settings menu item in the app.
+             The context key 'module' tells Odoo's settings controller
+             to scroll to / highlight the hr_anonymous_message block.
+             ============================================================ -->
+        <record id="action_hr_anonymous_config_settings" model="ir.actions.act_window">
+            <field name="name">Report &amp; Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+            <field name="context">{'module': 'hr_anonymous_message'}</field>
+        </record>
+
+        <!-- ============================================================
+             Report & Settings menu under Anonymous HR — Admin only
+             ============================================================ -->
+        <menuitem
+            id="menu_hr_anonymous_report_settings"
+            name="Report &amp; Settings"
+            parent="hr_anonymous_message.menu_anonymous_message_root"
+            action="action_hr_anonymous_config_settings"
+            groups="hr_anonymous_message.group_hr_anonymous_admin"
+            sequence="50"/>
 
     </data>
 </odoo>
